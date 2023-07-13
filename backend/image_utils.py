@@ -1,9 +1,11 @@
-from io import IOBase
+from io import BytesIO, IOBase
 from pathlib import Path
 from typing import Union
 
 import PIL.Image
 import PIL.ImageDraw
+
+from constants import IMG_OUTPUT_EXT
 
 
 def format_image(
@@ -42,3 +44,9 @@ def add_point_to_image(
     x, y = point
     draw.ellipse([(x - radius, y - radius), (x + radius, y + radius)], fill=color)
     return image_mod
+
+
+def pil_to_bytes(image: PIL.Image.Image):
+    buff = BytesIO()
+    image.save(buff, format=IMG_OUTPUT_EXT)
+    return buff.getvalue()

@@ -2,9 +2,20 @@ import PIL.Image
 import streamlit as st
 from streamlit_image_coordinates import streamlit_image_coordinates
 
-from backend.image_utils import add_point_to_image, format_image
+from backend.image_utils import add_point_to_image, format_image, pil_to_bytes
 from backend.sam import generate_mask, init_sam
-from constants import DEV_IMAGE, DEV_MASK, DEV_MODE, DEV_SEGM, IMG_SIZE, POINT_RADIUS
+from backend.stable_diffusion import generate_inpainting, init_sd
+from constants import (
+    DEV_IMAGE,
+    DEV_MASK,
+    DEV_MODE,
+    DEV_OUT,
+    DEV_SEGM,
+    IMG_OUTPUT_EXT,
+    IMG_OUTPUT_NAME,
+    IMG_POINT_RADIUS,
+    IMG_SIZE,
+)
 
 
 def app():
@@ -21,6 +32,7 @@ def app():
             st.session_state["image_displayed"] = st.session_state["image_original"]
             st.session_state["mask"] = PIL.Image.open(DEV_MASK)
             st.session_state["segm"] = PIL.Image.open(DEV_SEGM)
+            st.session_state["output"] = PIL.Image.open(DEV_OUT)
 
     if "image_original" not in st.session_state:
         uploaded_picture = st.file_uploader(
@@ -44,7 +56,7 @@ def app():
             ):
                 st.session_state["points"].append(xy)
                 st.session_state["image_displayed"] = add_point_to_image(
-                    st.session_state["image_displayed"], xy, radius=POINT_RADIUS
+                    st.session_state["image_displayed"], xy, radius=IMG_POINT_RADIUS
                 )
                 st.experimental_rerun()
 
@@ -56,11 +68,11 @@ def app():
             st.experimental_rerun()
 
         if col2.button(
-            "Segment Anything",
+            "Generate mask",
             disabled=len(st.session_state["points"]) == 0,
             use_container_width=True,
         ):
-            with st.spinner("Running Segment-Anything-Model... SAM for friends"):
+            with st.spinner("Running Segment-Anything-Model (SAM for friends)..."):
                 if "sam" not in st.session_state:
                     st.session_state["sam"] = init_sam()
 
@@ -76,6 +88,27 @@ def app():
 
             pos_prompt = st.text_input("Positive prompt")
             neg_prompt = st.text_input("Negative prompt")
-            st.button("Generate")
 
-        st.button("Test button")
+            if st.button("Generate inpainting", use_container_width=True):
+                with st.spinner("Running Stable Diffusion inpainting..."):
+                    if "pipe" not in st.session_state:
+                        st.session_state["pipe"] = init_sd()
+
+                    st.session_state["output"] = generate_inpainting(
+                        st.session_state["pipe"],
+                        st.session_state["image_original"],
+                        st.session_state["mask"],
+                        st.session_state["segm"],
+                        pos_prompt,
+                        neg_prompt,
+                    )
+
+            if "output" in st.session_state:
+                st.image(st.session_state["output"])
+                st.download_button(
+                    "Download image",
+                    data=pil_to_bytes(st.session_state["output"]),
+                    file_name=f"{IMG_OUTPUT_NAME}.{IMG_OUTPUT_EXT}",
+                    mime=f"image/{IMG_OUTPUT_EXT}",
+                    use_container_width=True,
+                )
