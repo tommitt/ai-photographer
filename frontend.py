@@ -1,9 +1,10 @@
+import PIL.Image
 import streamlit as st
 from streamlit_image_coordinates import streamlit_image_coordinates
 
 from backend.image_utils import add_point_to_image, format_image
 from backend.sam import generate_mask, init_sam
-from constants import IMG_SIZE, POINT_RADIUS
+from constants import DEV_IMAGE, DEV_MASK, DEV_MODE, DEV_SEGM, IMG_SIZE, POINT_RADIUS
 
 
 def app():
@@ -14,6 +15,12 @@ def app():
         st.session_state["init_app"] = True
         st.session_state["points"] = []
         st.session_state["point_last_clicked"] = []
+
+        if DEV_MODE:
+            st.session_state["image_original"] = format_image(DEV_IMAGE, IMG_SIZE)
+            st.session_state["image_displayed"] = st.session_state["image_original"]
+            st.session_state["mask"] = PIL.Image.open(DEV_MASK)
+            st.session_state["segm"] = PIL.Image.open(DEV_SEGM)
 
     if "image_original" not in st.session_state:
         uploaded_picture = st.file_uploader(
@@ -67,8 +74,8 @@ def app():
             col1.image(st.session_state["mask"])
             col2.image(st.session_state["segm"])
 
-            # pos_prompt = st.text_input("Positive prompt")
-            # neg_prompt = st.text_input("Negative prompt")
-            # st.button("Generate")
+            pos_prompt = st.text_input("Positive prompt")
+            neg_prompt = st.text_input("Negative prompt")
+            st.button("Generate")
 
         st.button("Test button")
