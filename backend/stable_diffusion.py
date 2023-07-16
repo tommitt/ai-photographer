@@ -15,24 +15,30 @@ from constants import (
 
 
 def init_sd() -> StableDiffusionControlNetInpaintPipeline:
+    # TensorFloat32 mode for faster but slightly less accurate computations
+    torch.backends.cuda.matmul.allow_tf32 = True
+
     controlnet = ControlNetModel.from_pretrained(
         SD_CONTROLNET_MODEL,
-        torch_dtype=torch.float16,
+        torch_dtype=torch.float32,
     )
 
     pipe = StableDiffusionControlNetInpaintPipeline.from_pretrained(
         SD_INPAINTING_MODEL,
         controlnet=controlnet,
-        torch_dtype=torch.float16,
+        torch_dtype=torch.float32,
     )
 
     pipe.scheduler = UniPCMultistepScheduler.from_config(pipe.scheduler.config)
 
-    pipe.enable_model_cpu_offload()
-    pipe.enable_xformers_memory_efficient_attention()
-
     if SD_USE_CUDA:
         pipe = pipe.to("cuda")
+    else:
+        # for minimal memory consumption
+        pipe.enable_sequential_cpu_offload()
+        pipe.enable_attention_slicing(1)
+
+    pipe.enable_xformers_memory_efficient_attention()
 
     return pipe
 
@@ -46,15 +52,14 @@ def generate_inpainting(
     neg_prompt: str,
 ) -> PIL.Image.Image:
     output = pipe(
-        pos_prompt,
-        image,
-        mask,
-        segm,
-        negative_prompt=neg_prompt,
+        image=image,
+        mask_image=mask,
+        control_image=segm,
+        prompt=pos_prompt,
+        negative_prompt=None if neg_prompt == "" else neg_prompt,
         num_inference_steps=SD_NUM_INFERENCE_STEPS,
     )
 
-    if SD_USE_CUDA:
-        torch.cuda.empty_cache()
+    torch.cuda.empty_cache()
 
     return output.images[0]

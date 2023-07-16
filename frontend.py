@@ -1,4 +1,3 @@
-import PIL.Image
 import streamlit as st
 from streamlit_image_coordinates import streamlit_image_coordinates
 
@@ -15,6 +14,8 @@ from constants import (
     IMG_OUTPUT_NAME,
     IMG_POINT_RADIUS,
     IMG_SIZE,
+    PROMPT_INIT_NEG,
+    PROMPT_INIT_POS,
 )
 
 
@@ -30,9 +31,9 @@ def app():
         if DEV_MODE:
             st.session_state["image_original"] = format_image(DEV_IMAGE, IMG_SIZE)
             st.session_state["image_displayed"] = st.session_state["image_original"]
-            st.session_state["mask"] = PIL.Image.open(DEV_MASK)
-            st.session_state["segm"] = PIL.Image.open(DEV_SEGM)
-            st.session_state["output"] = PIL.Image.open(DEV_OUT)
+            st.session_state["mask"] = format_image(DEV_MASK, IMG_SIZE)
+            st.session_state["segm"] = format_image(DEV_SEGM, IMG_SIZE)
+            st.session_state["output"] = format_image(DEV_OUT, IMG_SIZE)
 
     if "image_original" not in st.session_state:
         uploaded_picture = st.file_uploader(
@@ -47,7 +48,9 @@ def app():
             st.experimental_rerun()
     else:
         st.write("Click on the product to show me where it is...")
-        clicked_point = streamlit_image_coordinates(st.session_state["image_displayed"])
+        clicked_point = streamlit_image_coordinates(
+            st.session_state["image_displayed"], height=IMG_SIZE, width=IMG_SIZE
+        )
         if clicked_point is not None:
             xy = list(clicked_point.values())
             if (
@@ -86,8 +89,8 @@ def app():
             col1.image(st.session_state["mask"])
             col2.image(st.session_state["segm"])
 
-            pos_prompt = st.text_input("Positive prompt")
-            neg_prompt = st.text_input("Negative prompt")
+            pos_prompt = st.text_input("Positive prompt", value=PROMPT_INIT_POS)
+            neg_prompt = st.text_input("Negative prompt", value=PROMPT_INIT_NEG)
 
             if st.button("Generate inpainting", use_container_width=True):
                 with st.spinner("Running Stable Diffusion inpainting..."):
