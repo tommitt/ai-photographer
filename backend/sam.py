@@ -7,6 +7,7 @@ import torch.cuda
 from segment_anything import SamAutomaticMaskGenerator, SamPredictor, sam_model_registry
 from segment_anything.modeling import Sam
 
+from backend.image_utils import bg_image_w_black_mask
 from constants import SAM_CHECKPOINT, SAM_REGISTRY, SAM_USE_CUDA
 
 
@@ -45,7 +46,8 @@ def generate_mask(
     # image segmentation
     sam_auto_generator = SamAutomaticMaskGenerator(sam)
 
-    bool_masks_out = sam_auto_generator.generate(image_array)
+    bg_image = bg_image_w_black_mask(image, mask_image)
+    bool_masks_out = sam_auto_generator.generate(np.array(bg_image))
 
     bool_masks = [s["segmentation"] for s in bool_masks_out]
     segm_array = np.zeros(

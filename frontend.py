@@ -5,8 +5,8 @@ from backend.image_captioning import generate_caption, init_image_captioning
 from backend.image_utils import (
     add_point_to_image,
     format_image,
+    masked_image_w_white_bg,
     pil_to_bytes,
-    white_bg_masked_image,
 )
 from backend.sam import generate_mask, init_sam
 from backend.stable_diffusion import generate_inpainting, init_sd
@@ -101,7 +101,7 @@ def app():
             st.divider()
             st.subheader("Product description")
 
-            image_white_bg = white_bg_masked_image(
+            image_white_bg = masked_image_w_white_bg(
                 st.session_state["image_original"], st.session_state["mask"]
             )
             st.image(image_white_bg)

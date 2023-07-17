@@ -51,9 +51,17 @@ def pil_to_bytes(image: PIL.Image.Image, ext: str) -> bytes:
     return buff.getvalue()
 
 
-def white_bg_masked_image(
+def masked_image_w_white_bg(
     image: PIL.Image.Image, mask: PIL.Image.Image
 ) -> PIL.Image.Image:
     image_array = np.array(image)
     mask_array = np.array(mask)[:, :, np.newaxis]
     return PIL.Image.fromarray(np.where((mask_array == 0), image_array, 255))
+
+
+def bg_image_w_black_mask(
+    image: PIL.Image.Image, mask: PIL.Image.Image
+) -> PIL.Image.Image:
+    image_array = np.array(image)
+    mask_array = np.array(mask)[:, :, np.newaxis]
+    return PIL.Image.fromarray(np.where((mask_array == 0), 0, image_array))
