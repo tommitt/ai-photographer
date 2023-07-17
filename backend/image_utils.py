@@ -2,10 +2,9 @@ from io import BytesIO, IOBase
 from pathlib import Path
 from typing import Union
 
+import numpy as np
 import PIL.Image
 import PIL.ImageDraw
-
-from constants import IMG_OUTPUT_EXT
 
 
 def format_image(
@@ -46,7 +45,15 @@ def add_point_to_image(
     return image_mod
 
 
-def pil_to_bytes(image: PIL.Image.Image):
+def pil_to_bytes(image: PIL.Image.Image, ext: str) -> bytes:
     buff = BytesIO()
-    image.save(buff, format=IMG_OUTPUT_EXT)
+    image.save(buff, format=ext)
     return buff.getvalue()
+
+
+def white_bg_masked_image(
+    image: PIL.Image.Image, mask: PIL.Image.Image
+) -> PIL.Image.Image:
+    image_array = np.array(image)
+    mask_array = np.array(mask)[:, :, np.newaxis]
+    return PIL.Image.fromarray(np.where((mask_array == 0), image_array, 255))

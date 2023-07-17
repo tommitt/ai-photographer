@@ -6,8 +6,10 @@ IMG_OUTPUT_EXT: str = "jpeg"
 # options: jpeg, png
 
 # Prompt
-PROMPT_INIT_POS = "professional shot of a product, magazine picture, elegant, minimal"
-PROMPT_INIT_NEG = "blurry, ugly, low quality, nsfw"
+PROMPT_INIT_POS: str = (
+    "professional shot of a product, magazine picture, elegant, minimal"
+)
+PROMPT_INIT_NEG: str = "blurry, ugly, low quality, nsfw"
 
 # Segment Anything
 SAM_REGISTRY: str = "default"
@@ -23,8 +25,13 @@ SD_CONTROLNET_MODEL: str = "lllyasviel/sd-controlnet-seg"
 SD_NUM_INFERENCE_STEPS: int = 20
 SD_USE_CUDA: bool = False
 
+# Image captioning
+CAPTION_MODEL: str = "microsoft/git-large-r-coco"
+# options: nlpconnect/vit-gpt2-image-captioning, microsoft/git-base-coco, microsoft/git-large-r-coco, Salesforce/blip-image-captioning-base, Salesforce/blip-image-captioning-large
+CAPTION_MAX_TOKENS: int = 50
+
 # Developer
-DEV_MODE: bool = True
+DEV_MODE: bool = False
 DEV_IMAGE: str = "output/image.jpg"
 DEV_MASK: str = "output/mask.jpg"
 DEV_SEGM: str = "output/segm.jpg"
