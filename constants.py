@@ -21,8 +21,10 @@ SD_INPAINTING_MODEL: str = "runwayml/stable-diffusion-inpainting"
 SD_CONTROLNET_MODEL: str = "lllyasviel/sd-controlnet-seg"
 # options for inpainting + controlnet:
 #   runwayml/stable-diffusion-inpainting + lllyasviel/sd-controlnet-seg
+#   runwayml/stable-diffusion-v1-5 + lllyasviel/control_v11p_sd15_seg
 #   stabilityai/stable-diffusion-2-inpainting + thibaud/controlnet-sd21-ade20k-diffusers
-SD_NUM_INFERENCE_STEPS: int = 20
+SD_NUM_INFERENCE_STEPS: int = 30  # default 50
+SD_CONDITIONING_SCALE: float = 1.5  # default 0.5
 SD_USE_CUDA: bool = False
 
 # Image captioning

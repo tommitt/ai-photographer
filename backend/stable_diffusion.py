@@ -7,6 +7,7 @@ from diffusers import (
 )
 
 from constants import (
+    SD_CONDITIONING_SCALE,
     SD_CONTROLNET_MODEL,
     SD_INPAINTING_MODEL,
     SD_NUM_INFERENCE_STEPS,
@@ -58,6 +59,7 @@ def generate_inpainting(
         prompt=pos_prompt,
         negative_prompt=None if neg_prompt == "" else neg_prompt,
         num_inference_steps=SD_NUM_INFERENCE_STEPS,
+        controlnet_conditioning_scale=SD_CONDITIONING_SCALE,
     )
 
     torch.cuda.empty_cache()

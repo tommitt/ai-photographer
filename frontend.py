@@ -107,12 +107,13 @@ def app():
             st.image(image_white_bg)
 
             if st.button("Generate caption", use_container_width=True):
-                if "pipe_caption" not in st.session_state:
-                    st.session_state["pipe_caption"] = init_image_captioning()
+                with st.spinner("Running image captioning model..."):
+                    if "pipe_caption" not in st.session_state:
+                        st.session_state["pipe_caption"] = init_image_captioning()
 
-                st.session_state["caption"] = generate_caption(
-                    st.session_state["pipe_caption"], image_white_bg
-                )
+                    st.session_state["caption"] = generate_caption(
+                        st.session_state["pipe_caption"], image_white_bg
+                    )
 
             if "caption" in st.session_state:
                 st.write(st.session_state["caption"])

@@ -6,6 +6,6 @@ accelerate==0.20.3
 scipy==1.10.1
 safetensors==0.3.1
 xformers==0.0.20
-segment_anything==1.0
+git+https://github.com/facebookresearch/segment-anything.git
 streamlit==1.24.1
 streamlit_image_coordinates==0.1.3
