@@ -11,16 +11,16 @@
 * Run with `streamlit run main.py` (it takes some time at the first run to download the Stable Diffusion images from Hugging Face)
 * Upload your product picture
 
-![Shot1](assets/shot1.png)
+![Shot1](assets/shot1.PNG)
 
 * Click on the product for helping the segmentation and generate the mask
 
-![Shot2](assets/shot2.png)
+![Shot2](assets/shot2.PNG)
 
 * Once the mask has been generated, write a prompt for the AI to generate the inpainting
 
-![Shot3](assets/shot3.png)
+![Shot3](assets/shot3.PNG)
 
 * Obtain the final result (and iterate with the prompt if needed)
 
-![Shot4](assets/shot4.png)
+![Shot4](assets/shot4.PNG)
