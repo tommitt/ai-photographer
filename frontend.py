@@ -11,6 +11,7 @@ from backend.image_utils import (
 from backend.sam import generate_mask, init_sam
 from backend.stable_diffusion import generate_inpainting, init_sd
 from constants import (
+    CAPTION_ACTIVE,
     DEV_IMAGE,
     DEV_MASK,
     DEV_MODE,
@@ -98,52 +99,53 @@ def app():
             col1.image(st.session_state["mask"])
             col2.image(st.session_state["segm"])
 
-            st.divider()
-            st.subheader("Product description")
-
-            image_white_bg = masked_image_w_white_bg(
-                st.session_state["image_original"], st.session_state["mask"]
-            )
-            st.image(image_white_bg)
-
-            if st.button("Generate caption", use_container_width=True):
-                with st.spinner("Running image captioning model..."):
-                    if "pipe_caption" not in st.session_state:
-                        st.session_state["pipe_caption"] = init_image_captioning()
-
-                    st.session_state["caption"] = generate_caption(
-                        st.session_state["pipe_caption"], image_white_bg
-                    )
-
-            if "caption" in st.session_state:
-                st.write(st.session_state["caption"])
-
+            if CAPTION_ACTIVE:
                 st.divider()
-                st.subheader("Inpaint background")
+                st.subheader("Product captioning")
 
-                pos_prompt = st.text_input("Positive prompt", value=PROMPT_INIT_POS)
-                neg_prompt = st.text_input("Negative prompt", value=PROMPT_INIT_NEG)
+                image_white_bg = masked_image_w_white_bg(
+                    st.session_state["image_original"], st.session_state["mask"]
+                )
+                st.image(image_white_bg)
 
-                if st.button("Generate inpainting", use_container_width=True):
-                    with st.spinner("Running Stable Diffusion inpainting..."):
-                        if "pipe" not in st.session_state:
-                            st.session_state["pipe"] = init_sd()
+                if st.button("Generate caption", use_container_width=True):
+                    with st.spinner("Running image captioning model..."):
+                        if "pipe_caption" not in st.session_state:
+                            st.session_state["pipe_caption"] = init_image_captioning()
 
-                        st.session_state["output"] = generate_inpainting(
-                            st.session_state["pipe"],
-                            st.session_state["image_original"],
-                            st.session_state["mask"],
-                            st.session_state["segm"],
-                            pos_prompt,
-                            neg_prompt,
+                        st.session_state["caption"] = generate_caption(
+                            st.session_state["pipe_caption"], image_white_bg
                         )
 
-                if "output" in st.session_state:
-                    st.image(st.session_state["output"])
-                    st.download_button(
-                        "Download image",
-                        data=pil_to_bytes(st.session_state["output"], IMG_OUTPUT_EXT),
-                        file_name=f"{IMG_OUTPUT_NAME}.{IMG_OUTPUT_EXT}",
-                        mime=f"image/{IMG_OUTPUT_EXT}",
-                        use_container_width=True,
+                if "caption" in st.session_state:
+                    st.write(st.session_state["caption"])
+
+            st.divider()
+            st.subheader("Inpaint background")
+
+            pos_prompt = st.text_input("Positive prompt", value=PROMPT_INIT_POS)
+            neg_prompt = st.text_input("Negative prompt", value=PROMPT_INIT_NEG)
+
+            if st.button("Generate inpainting", use_container_width=True):
+                with st.spinner("Running Stable Diffusion inpainting..."):
+                    if "pipe" not in st.session_state:
+                        st.session_state["pipe"] = init_sd()
+
+                    st.session_state["output"] = generate_inpainting(
+                        st.session_state["pipe"],
+                        st.session_state["image_original"],
+                        st.session_state["mask"],
+                        st.session_state["segm"],
+                        pos_prompt,
+                        neg_prompt,
                     )
+
+            if "output" in st.session_state:
+                st.image(st.session_state["output"])
+                st.download_button(
+                    "Download image",
+                    data=pil_to_bytes(st.session_state["output"], IMG_OUTPUT_EXT),
+                    file_name=f"{IMG_OUTPUT_NAME}.{IMG_OUTPUT_EXT}",
+                    mime=f"image/{IMG_OUTPUT_EXT}",
+                    use_container_width=True,
+                )

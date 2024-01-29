@@ -28,6 +28,7 @@ SD_CONDITIONING_SCALE: float = 1.5  # default 0.5
 SD_USE_CUDA: bool = False
 
 # Image captioning
+CAPTION_ACTIVE: bool = False
 CAPTION_MODEL: str = "microsoft/git-large-r-coco"
 # options: nlpconnect/vit-gpt2-image-captioning, microsoft/git-base-coco, microsoft/git-large-r-coco, Salesforce/blip-image-captioning-base, Salesforce/blip-image-captioning-large
 CAPTION_MAX_TOKENS: int = 50
